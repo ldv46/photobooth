@@ -22,10 +22,10 @@ from signal import alarm, signal, SIGALRM, SIGKILL
 ########################
 ### Variables Config ###
 ########################
-led1_pin = 15 # LED 1
-led2_pin = 19 # LED 2
-led3_pin = 21 # LED 3
-led4_pin = 23 # LED 4
+led1_pin = 15 # LED 1 ROOD
+led2_pin = 19 # LED 2 ROOD
+led3_pin = 21 # LED 3 GROEN
+led_relais_pin = 23 # LED to show relais is turned on BLAUW
 button1_pin = 22 # pin for the big red button
 button2_pin = 18 # pin for button to shutdown the pi
 button3_pin = 16 # pin for button to end the program, but not shutdown the pi
@@ -60,7 +60,7 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setup(led1_pin,GPIO.OUT) # LED 1
 GPIO.setup(led2_pin,GPIO.OUT) # LED 2
 GPIO.setup(led3_pin,GPIO.OUT) # LED 3
-GPIO.setup(led4_pin,GPIO.OUT) # LED 4
+GPIO.setup(led_relais_pin,GPIO.OUT) # LED 4
 GPIO.setup(relais1_pin,GPIO.OUT) # relais 1
 GPIO.setup(button1_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # falling edge detection on button 1
 GPIO.setup(button2_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # falling edge detection on button 2
@@ -68,7 +68,7 @@ GPIO.setup(button3_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # falling edge detect
 GPIO.output(led1_pin,False);
 GPIO.output(led2_pin,False);
 GPIO.output(led3_pin,False);
-GPIO.output(led4_pin,False); #for some reason the pin turns on at the beginning of the program. why?????????????????????????????????
+GPIO.output(led_relais_pin,False); #for some reason the pin turns on at the beginning of the program. why?????????????????????????????????
 
 
 #################
@@ -85,7 +85,7 @@ def shut_it_down(channel):
     GPIO.output(led1_pin,True);
     GPIO.output(led2_pin,True);
     GPIO.output(led3_pin,True);
-    GPIO.output(led4_pin,True);
+    GPIO.output(led_relais_pin,True);
     time.sleep(3)
     os.system("sudo halt")
 
@@ -155,6 +155,7 @@ def start_photobooth():
 	try: #take the photos
 		for i, filename in enumerate(camera.capture_continuous(file_path + now + '-' + '{counter:02d}.jpg')):
 			GPIO.output(led2_pin,True) #turn on the LED
+			GPIO.output(led_relais_pin,True) #turn on the LED
 			print(filename)
 			sleep(0.25) #pause the LED on for just a bit
 			GPIO.output(led2_pin,False) #turn off the LED
@@ -164,46 +165,11 @@ def start_photobooth():
 	finally:
 		camera.stop_preview()
 		camera.close()
+		GPIO.output(led_relais_pin,False)
 		GPIO.output(relais1_pin,False); 
 
 	########################### Begin Step 3 #################################
-#	print "Creating an animated gif" 
-#	GPIO.output(led3_pin,True) #turn on the LED
-#	graphicsmagick = "gm convert -delay " + str(gif_delay) + " " + file_path + now + "*.jpg " + file_path + now + ".gif" 
-#	os.system(graphicsmagick) #make the .gif
-#	print "Uploading to tumblr. Please check " + tumblr_blog + " soon." 
-#	connected = is_connected() #check to see if you have an internet connection
-#	while connected: 
-#		try:
-#			msg = MIMEMultipart()
-#			msg['Subject'] = now
-#			msg['From'] = addr_from
-#			msg['To'] = addr_to
-#			file_to_upload = file_path + now + ".gif"
-#			fp = open(file_to_upload, 'rb')
-#			part = MIMEBase('image', 'gif')
-#			part.set_payload( fp.read() )
-#			Encoders.encode_base64(part)
-#			part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(file_path))
-#			fp.close()
-#			msg.attach(part)
-#			server = smtplib.SMTP('smtp.gmail.com:587')
-#			server.starttls()
-#			server.login(user_name, password)
-#			server.sendmail(msg['From'], msg['To'], msg.as_string())
-#			server.quit()
-#			break
-#		except ValueError:
-#			print "Oops. No internect connection. Upload later."
-#			try: #make a text file as a note to upload the .gif later
-#				file = open(file_path + now + "-FILENOTUPLOADED.txt",'w')   # Trying to create a new file or open one
-#				file.close()
-#			except:
-#				print('Something went wrong. Could not write file.')
-#				sys.exit(0) # quit Python
-#	GPIO.output(led3_pin,False) #turn off the LED
-	########################### Begin Step 4 #################################
-	GPIO.output(led4_pin,True) #turn on the LED
+	GPIO.output(led3_pin,True) #turn on the LED
 	try:
 		display_pics(now)
 	except Exception, e:
@@ -211,7 +177,7 @@ def start_photobooth():
 		traceback.print_exception(e.__class__, e, tb)
 	pygame.quit()
 	print "Done"
-	GPIO.output(led4_pin,False) #turn off the LED
+	GPIO.output(led3_pin,False) #turn off the LED
 
 ####################
 ### Main Program ###
@@ -226,22 +192,22 @@ print "Photo booth app running..."
 GPIO.output(led1_pin,True); #light up the lights to show the app is running at the beginning
 GPIO.output(led2_pin,True);
 GPIO.output(led3_pin,True);
-GPIO.output(led4_pin,True);
+GPIO.output(led_relais_pin,True);
 time.sleep(1)
 GPIO.output(led1_pin,False); #turn off the lights
 GPIO.output(led2_pin,False);
 GPIO.output(led3_pin,False);
-GPIO.output(led4_pin,False);
+GPIO.output(led_relais_pin,False);
 time.sleep(0,5)
 GPIO.output(led1_pin,True);
 GPIO.output(led2_pin,True);
 GPIO.output(led3_pin,True);
-GPIO.output(led4_pin,True);
+GPIO.output(led_relais_pin,True);
 time.sleep(1)
 GPIO.output(led1_pin,False);
 GPIO.output(led2_pin,False);
 GPIO.output(led3_pin,False);
-GPIO.output(led4_pin,False);
+GPIO.output(led_relais_pin,False);
 
 
 # wait for the big button to be pressed
