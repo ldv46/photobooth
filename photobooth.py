@@ -25,7 +25,8 @@ from signal import alarm, signal, SIGALRM, SIGKILL
 led1_pin = 15 # LED 1 ROOD
 led2_pin = 19 # LED 2 ROOD
 led3_pin = 21 # LED 3 GROEN
-led_relais_pin = 23 # LED to show relais is turned on BLAUW
+led4_pin = 23 # LED 4 to show relais is turned on BLAUW
+led5_pin = 21 # LED 3 to light the big button RED
 button1_pin = 22 # pin for the big red button
 button2_pin = 18 # pin for button to shutdown the pi
 button3_pin = 16 # pin for button to end the program, but not shutdown the pi
@@ -60,15 +61,15 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setup(led1_pin,GPIO.OUT) # LED 1
 GPIO.setup(led2_pin,GPIO.OUT) # LED 2
 GPIO.setup(led3_pin,GPIO.OUT) # LED 3
-GPIO.setup(led_relais_pin,GPIO.OUT) # LED 4
-GPIO.setup(relais1_pin,GPIO.OUT) # relais 1
+GPIO.setup(led4_pin,GPIO.OUT) # LED 4
+GPIO.setup(relais1_pin,GPIO.OUT) # relay 1 to switch on external light source (230V)
 GPIO.setup(button1_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # falling edge detection on button 1
 GPIO.setup(button2_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # falling edge detection on button 2
 GPIO.setup(button3_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # falling edge detection on button 3
 GPIO.output(led1_pin,False);
 GPIO.output(led2_pin,False);
 GPIO.output(led3_pin,False);
-GPIO.output(led_relais_pin,False); #for some reason the pin turns on at the beginning of the program. why?????????????????????????????????
+GPIO.output(led4_pin,False); #for some reason the pin turns on at the beginning of the program. why?????????????????????????????????
 
 
 #################
@@ -155,7 +156,7 @@ def start_photobooth():
 	try: #take the photos
 		for i, filename in enumerate(camera.capture_continuous(file_path + now + '-' + '{counter:02d}.jpg')):
 			GPIO.output(led2_pin,True) #turn on the LED
-			GPIO.output(led_relais_pin,True) #turn on the LED
+			GPIO.output(led4_pin,True) #turn on the LED to show relay is on
 			print(filename)
 			sleep(0.25) #pause the LED on for just a bit
 			GPIO.output(led2_pin,False) #turn off the LED
@@ -165,7 +166,7 @@ def start_photobooth():
 	finally:
 		camera.stop_preview()
 		camera.close()
-		GPIO.output(led_relais_pin,False)
+		GPIO.output(led4_pin,False) #turn off the LED to show relay is off
 		GPIO.output(relais1_pin,False); 
 
 	########################### Begin Step 3 #################################
@@ -190,24 +191,18 @@ GPIO.add_event_detect(button3_pin, GPIO.FALLING, callback=exit_photobooth, bounc
 
 print "Photo booth app running..." 
 GPIO.output(led1_pin,True); #light up the lights to show the app is running at the beginning
-GPIO.output(led2_pin,True);
-GPIO.output(led3_pin,True);
-GPIO.output(led_relais_pin,True);
 time.sleep(1)
-GPIO.output(led1_pin,False); #turn off the lights
-GPIO.output(led2_pin,False);
-GPIO.output(led3_pin,False);
-GPIO.output(led_relais_pin,False);
-time.sleep(0,5)
-GPIO.output(led1_pin,True);
 GPIO.output(led2_pin,True);
+time.sleep(1)
 GPIO.output(led3_pin,True);
-GPIO.output(led_relais_pin,True);
+time.sleep(2)
+GPIO.output(led3_pin,False); #turn off the lights
+time.sleep(1)
+GPIO.output(led2_pin,False);
 time.sleep(1)
 GPIO.output(led1_pin,False);
-GPIO.output(led2_pin,False);
-GPIO.output(led3_pin,False);
-GPIO.output(led_relais_pin,False);
+time.sleep(0,5)
+
 
 
 # wait for the big button to be pressed
