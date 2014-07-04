@@ -22,11 +22,11 @@ from signal import alarm, signal, SIGALRM, SIGKILL
 ########################
 ### Variables Config ###
 ########################
-led1_pin = 15 # LED 1 ROOD
-led2_pin = 19 # LED 2 ROOD
-led3_pin = 21 # LED 3 GROEN
+led1_pin = 15 # LED 1 ROOD - Ready
+led2_pin = 19 # LED 2 ROOD - Pose (pictures are being taken)
+led3_pin = 21 # LED 3 GROEN - Done
 led4_pin = 23 # LED 4 to show relais is turned on BLAUW
-led5_pin = 21 # LED 3 to light the big button RED
+led5_pin = 21 # LED 3 to light the big button RED (always on, unless button is pushed)
 button1_pin = 22 # pin for the big red button
 button2_pin = 18 # pin for button to shutdown the pi
 button3_pin = 16 # pin for button to end the program, but not shutdown the pi
