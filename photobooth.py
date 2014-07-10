@@ -22,37 +22,35 @@ from signal import alarm, signal, SIGALRM, SIGKILL
 ########################
 ### Variables Config ###
 ########################
-led1_pin = 15 # LED 1 ROOD - Ready
-led2_pin = 19 # LED 2 ROOD - Pose (pictures are being taken)
-led3_pin = 21 # LED 3 GROEN - Done
-led4_pin = 23 # LED 4 to show relais is turned on BLAUW
-led5_pin = 21 # LED 3 to light the big button RED (always on, unless button is pushed)
+led1_pin = 15 # LED 1
+led2_pin = 19 # LED 2
+led3_pin = 21 # LED 3
+led4_pin = 23 # LED 4
 button1_pin = 22 # pin for the big red button
 button2_pin = 18 # pin for button to shutdown the pi
 button3_pin = 16 # pin for button to end the program, but not shutdown the pi
-relais1_pin = 26 # pin for relais to be switched on before pictures being taken and turn of after pictures are taken.
 
-total_pics = 3 # number of pics  to be taken
-capture_delay = 3 # delay between pics
+total_pics = 4 # number of pics  to be taken
+capture_delay = 1 # delay between pics
 prep_delay = 4 # number of seconds at step 1 as users prep to have photo taken
 gif_delay = 100 # How much time between frames in the animated gif
 
 file_path = '/home/pi/photobooth/' #where do you want to save the photos
-#tumblr_blog = 'username.tumblr.com' # change to your tumblr page
-#addr_to   = 'secretcodehere@tumblr.com' # The special tumblr auto post email address
-#addr_from = 'username@gmail.com' # change to your full gmail address
-#user_name = 'username' # change to your gmail username
-#password = 'secretpasswordhere' # change to your gmail password
-#test_server = 'www.google.com'
+tumblr_blog = 'username.tumblr.com' # change to your tumblr page
+addr_to   = 'secretcodehere@tumblr.com' # The special tumblr auto post email address
+addr_from = 'username@gmail.com' # change to your full gmail address
+user_name = 'username' # change to your gmail username
+password = 'secretpasswordhere' # change to your gmail password
+test_server = 'www.google.com'
 
-w = 800 # width of screen in pixels
-h = 480 # height of screen in pixels
-transform_x = 640 # how wide to scale the jpg when replaying
-transfrom_y = 480 # how high to scale the jpg when replaying
-offset_x = 80 # how far off to left corner to display photos ((width screen-width picture) / 2)
-offset_y = 0 # how far off to left corner to display photos ((height screen-height picture) / 2)
-replay_delay = 1 # how much to wait in-between showing pics on-screen after taking
-replay_cycles = 4 # how many times to show each photo on-screen after taking
+w = 1280 # width of screen in pixels
+h = 720 # height of screen in pixels
+transform_x = 1280 # how wide to scale the jpg when replaying
+transfrom_y = 972 # how high to scale the jpg when replaying
+offset_x = 0 # how far off to left corner to display photos
+offset_y = 0 # how far off to left corner to display photos
+replay_delay = 0.5 # how much to wait in-between showing pics on-screen after taking
+replay_cycles = 2 # how many times to show each photo on-screen after taking
 
 ####################
 ### Other Config ###
@@ -62,7 +60,6 @@ GPIO.setup(led1_pin,GPIO.OUT) # LED 1
 GPIO.setup(led2_pin,GPIO.OUT) # LED 2
 GPIO.setup(led3_pin,GPIO.OUT) # LED 3
 GPIO.setup(led4_pin,GPIO.OUT) # LED 4
-GPIO.setup(relais1_pin,GPIO.OUT) # relay 1 to switch on external light source (230V)
 GPIO.setup(button1_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # falling edge detection on button 1
 GPIO.setup(button2_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # falling edge detection on button 2
 GPIO.setup(button3_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) # falling edge detection on button 3
@@ -70,7 +67,6 @@ GPIO.output(led1_pin,False);
 GPIO.output(led2_pin,False);
 GPIO.output(led3_pin,False);
 GPIO.output(led4_pin,False); #for some reason the pin turns on at the beginning of the program. why?????????????????????????????????
-
 
 #################
 ### Functions ###
@@ -86,7 +82,7 @@ def shut_it_down(channel):
     GPIO.output(led1_pin,True);
     GPIO.output(led2_pin,True);
     GPIO.output(led3_pin,True);
-    GPIO.output(led_relais_pin,True);
+    GPIO.output(led4_pin,True);
     time.sleep(3)
     os.system("sudo halt")
 
@@ -140,7 +136,7 @@ def start_photobooth():
 	################################# Begin Step 1 ################################# 
 	print "Get Ready" 
 	camera = picamera.PiCamera()
-	camera.resolution = (2592, 1944) #use a smaller size to process faster, and tumblr will only take up to 500 pixels wide for animated gifs
+	camera.resolution = (2592, 1944) #use a smaller size to process faster
 	camera.vflip = True
 	camera.hflip = True
 	camera.saturation = 0
@@ -148,7 +144,6 @@ def start_photobooth():
 	i=1 #iterate the blink of the light in prep, also gives a little time for the camera to warm up
 	while i < prep_delay :
 	  GPIO.output(led1_pin,True); sleep(.5) 
-	  GPIO.output(relais1_pin,True); 
 	  GPIO.output(led1_pin,False); sleep(.5); i+=1
 	################################# Begin Step 2 #################################
 	print "Taking pics" 
@@ -156,7 +151,6 @@ def start_photobooth():
 	try: #take the photos
 		for i, filename in enumerate(camera.capture_continuous(file_path + now + '-' + '{counter:02d}.jpg')):
 			GPIO.output(led2_pin,True) #turn on the LED
-			GPIO.output(led4_pin,True) #turn on the LED to show relay is on
 			print(filename)
 			sleep(0.25) #pause the LED on for just a bit
 			GPIO.output(led2_pin,False) #turn off the LED
@@ -166,11 +160,9 @@ def start_photobooth():
 	finally:
 		camera.stop_preview()
 		camera.close()
-		GPIO.output(led4_pin,False) #turn off the LED to show relay is off
-		GPIO.output(relais1_pin,False); 
 
-	########################### Begin Step 3 #################################
-	GPIO.output(led3_pin,True) #turn on the LED
+	########################### Begin Step 4 #################################
+	GPIO.output(led4_pin,True) #turn on the LED
 	try:
 		display_pics(now)
 	except Exception, e:
@@ -178,7 +170,7 @@ def start_photobooth():
 		traceback.print_exception(e.__class__, e, tb)
 	pygame.quit()
 	print "Done"
-	GPIO.output(led3_pin,False) #turn off the LED
+	GPIO.output(led4_pin,False) #turn off the LED
 
 ####################
 ### Main Program ###
@@ -191,19 +183,17 @@ GPIO.add_event_detect(button3_pin, GPIO.FALLING, callback=exit_photobooth, bounc
 
 print "Photo booth app running..." 
 GPIO.output(led1_pin,True); #light up the lights to show the app is running at the beginning
-time.sleep(1)
+time.sleep(.5)
 GPIO.output(led2_pin,True);
-time.sleep(1)
+time.sleep(.5)
 GPIO.output(led3_pin,True);
-time.sleep(2)
-GPIO.output(led3_pin,False); #turn off the lights
-time.sleep(1)
+time.sleep(.5)
+GPIO.output(led4_pin,True);
+time.sleep(.5)
+GPIO.output(led1_pin,False); #turn off the lights
 GPIO.output(led2_pin,False);
-time.sleep(1)
-GPIO.output(led1_pin,False);
-time.sleep(0,5)
-
-
+GPIO.output(led3_pin,False);
+GPIO.output(led4_pin,False);
 
 # wait for the big button to be pressed
 while True:
