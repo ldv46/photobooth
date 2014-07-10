@@ -30,10 +30,9 @@ button1_pin = 22 # pin for the big red button
 button2_pin = 18 # pin for button to shutdown the pi
 button3_pin = 16 # pin for button to end the program, but not shutdown the pi
 
-total_pics = 2 # number of pics  to be taken
+total_pics = 4 # number of pics  to be taken
 capture_delay = 1 # delay between pics
 prep_delay = 1 # number of seconds at step 1 as users prep to have photo taken
-gif_delay = 100 # How much time between frames in the animated gif
 
 file_path = '/home/pi/photobooth/' #where do you want to save the photos
 tumblr_blog = 'username.tumblr.com' # change to your tumblr page
@@ -141,6 +140,8 @@ def start_photobooth():
 	camera.hflip = True
 	camera.saturation = 0
 	camera.start_preview()
+	camera.preview_fullscreen = True
+	preview_window = 0, 0, 70, 35
 	i=1 #iterate the blink of the light in prep, also gives a little time for the camera to warm up
 	while i < prep_delay :
 	  GPIO.output(led1_pin,True); sleep(.5) 
@@ -183,16 +184,19 @@ GPIO.add_event_detect(button3_pin, GPIO.FALLING, callback=exit_photobooth, bounc
 
 print "Photo booth app running..." 
 GPIO.output(led1_pin,True); #light up the lights to show the app is running at the beginning
-time.sleep(.5)
+time.sleep(.2)
 GPIO.output(led2_pin,True);
-time.sleep(.5)
+time.sleep(.2)
 GPIO.output(led3_pin,True);
-time.sleep(.5)
+time.sleep(.2)
 GPIO.output(led4_pin,True);
-time.sleep(.5)
+time.sleep(.2)
 GPIO.output(led1_pin,False); #turn off the lights
+time.sleep(.2)
 GPIO.output(led2_pin,False);
+time.sleep(.2)
 GPIO.output(led3_pin,False);
+time.sleep(.2)
 GPIO.output(led4_pin,False);
 
 # wait for the big button to be pressed
