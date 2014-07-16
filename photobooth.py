@@ -45,7 +45,7 @@ file_path = '/home/pi/photobooth/' #where do you want to save the photos
 
 w = 1440 # width of screen in pixels
 h = 900 # height of screen in pixels
-transform_x = h*1.3 # how wide to scale the jpg when replaying
+transform_x = int(w * 1.3) # how wide to scale the jpg when replaying
 transfrom_y = h # how high to scale the jpg when replayingoffset_x = 131 # how far off to left corner to display photos
 offset_y = 0 # how far off to left corner to display photos
 replay_delay = 0.5 # how much to wait in-between showing pics on-screen after taking
