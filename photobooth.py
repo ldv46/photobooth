@@ -155,7 +155,7 @@ def start_photobooth():
 	camera.stop_preview()
 	camera.resolution = (2592, 1944)
 	try: #take the photos
-			camera.capture(file_path + now + '.jpg'):
+			camera.capture(file_path + now + '.jpg')
 			GPIO.output(led2_pin,True) #turn on the LED
 			print(file_path + now + '.jpg')
 			GPIO.output(led2_pin,False) #turn off the LED
