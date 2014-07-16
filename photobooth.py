@@ -31,7 +31,7 @@ button1_pin = 22 # pin for the big red button
 button2_pin = 18 # pin for button to shutdown the pi
 button3_pin = 16 # pin for button to end the program, but not shutdown the pi
 
-total_pics = 4 # number of pics  to be taken
+total_pics = 1 # number of pics  to be taken
 capture_delay = 1 # delay between pics
 prep_delay = 5 # number of seconds at step 1 as users prep to have photo taken
 
