@@ -156,14 +156,10 @@ def start_photobooth():
 	camera.stop_preview()
 	camera.resolution = (2592, 1944)
 	try: #take the photos
-		for i, filename in enumerate(camera.capture_continuous(file_path + now + '-' + '{counter:02d}.jpg')):
+		filename in enumerate(camera.capture(file_path + now):
 			GPIO.output(led2_pin,True) #turn on the LED
 			print(filename)
-			sleep(0.25) #pause the LED on for just a bit
 			GPIO.output(led2_pin,False) #turn off the LED
-			sleep(capture_delay) # pause in-between shots
-			if i == total_pics-1:
-				break
 	finally:
 		camera.close()
 	GPIO.output(led4_pin,False) #turn on the LED
