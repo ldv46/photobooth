@@ -4,6 +4,7 @@
 
 import os
 import time
+import traceback
 from time import sleep
 import RPi.GPIO as GPIO
 import picamera
