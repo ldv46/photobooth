@@ -33,7 +33,7 @@ button3_pin = 16 # pin for button to end the program, but not shutdown the pi
 
 total_pics = 4 # number of pics  to be taken
 capture_delay = 1 # delay between pics
-prep_delay = 1 # number of seconds at step 1 as users prep to have photo taken
+prep_delay = 5 # number of seconds at step 1 as users prep to have photo taken
 
 file_path = '/home/pi/photobooth/' #where do you want to save the photos
 #tumblr_blog = 'username.tumblr.com' # change to your tumblr page
@@ -48,7 +48,7 @@ h = 900 # height of screen in pixels
 transform_x = int(h * 1.3) # how wide to scale the jpg when replaying
 transform_y = h # how high to scale the jpg when replayingoffset_x = 131 # how far off to left corner to display photos
 offset_y = 0 # how far off to left corner to display photos
-offset_x = 0
+offset_x = (w - transform_x) / 2
 replay_delay = 0.5 # how much to wait in-between showing pics on-screen after taking
 replay_cycles = 1 # how many times to show each photo on-screen after taking
 
@@ -137,14 +137,15 @@ def start_photobooth():
 	GPIO.output(led1_pin,True)
 	print "Get Ready" 
 	camera = picamera.PiCamera()
-	camera.resolution = (2592, 1944) #use a smaller size to process faster (2592, 1944)
+	camera.resolution = (transform_x, transform_y) #use a smaller size to process faster (2592, 1944)
 	camera.vflip = True
 	camera.hflip = True
 	camera.start_preview()
 	camera.preview_fullscreen=False
-	camera.preview_window = (0, 0, transform_x, h)
+	camera.preview_window = (offset_x, offset_y, transform_x, transform_y)
 	i=1 #iterate the blink of the light in prep, also gives a little time for the camera to warm up
 	GPIO.output(led1_pin,False)
+	sleep(prep_delay)
 	#while i < prep_delay :
 	  #GPIO.output(led1_pin,True); sleep(.5) 
 	  #GPIO.output(led1_pin,False); sleep(.5); i+=1
@@ -152,6 +153,8 @@ def start_photobooth():
 	GPIO.output(led4_pin,True) #turn on the LED
 	print "Taking pics" 
 	now = time.strftime("%Y%m%d%H%M%S") #get the current date and time for the start of the filename
+	camera.stop_preview()
+	camera.resolution = (2592, 1944)
 	try: #take the photos
 		for i, filename in enumerate(camera.capture_continuous(file_path + now + '-' + '{counter:02d}.jpg')):
 			GPIO.output(led2_pin,True) #turn on the LED
@@ -162,7 +165,6 @@ def start_photobooth():
 			if i == total_pics-1:
 				break
 	finally:
-		camera.stop_preview()
 		camera.close()
 	GPIO.output(led4_pin,False) #turn on the LED
 	########################### Begin Step 3 #################################
