@@ -44,8 +44,8 @@ test_server = 'www.google.com'
 
 w = 1280 # width of screen in pixels
 h = 720 # height of screen in pixels
-transform_x = 1280 # how wide to scale the jpg when replaying
-transfrom_y = 972 # how high to scale the jpg when replaying
+transform_x = h*1.3 # how wide to scale the jpg when replaying
+transfrom_y = h # how high to scale the jpg when replaying
 offset_x = 0 # how far off to left corner to display photos
 offset_y = 0 # how far off to left corner to display photos
 replay_delay = 0.5 # how much to wait in-between showing pics on-screen after taking
