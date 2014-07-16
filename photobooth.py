@@ -45,9 +45,10 @@ file_path = '/home/pi/photobooth/' #where do you want to save the photos
 
 w = 1440 # width of screen in pixels
 h = 900 # height of screen in pixels
-transform_x = int(w * 1.3) # how wide to scale the jpg when replaying
-transfrom_y = h # how high to scale the jpg when replayingoffset_x = 131 # how far off to left corner to display photos
+transform_x = int(h * 1.3) # how wide to scale the jpg when replaying
+transform_y = h # how high to scale the jpg when replayingoffset_x = 131 # how far off to left corner to display photos
 offset_y = 0 # how far off to left corner to display photos
+offset_x = 0
 replay_delay = 0.5 # how much to wait in-between showing pics on-screen after taking
 replay_cycles = 1 # how many times to show each photo on-screen after taking
 
@@ -125,7 +126,7 @@ def display_pics(jpg_group):
 		for i in range(1, total_pics+1): #show each pic
 			filename = file_path + jpg_group + "-0" + str(i) + ".jpg"
 			img=pygame.image.load(filename) 
-			img = pygame.transform.scale(img,(transform_x,transfrom_y))
+			img = pygame.transform.scale(img,(transform_x,transform_y))
 			screen.blit(img,(offset_x,offset_y))
 			pygame.display.flip() # update the display
 			time.sleep(replay_delay) # pause 
@@ -140,8 +141,8 @@ def start_photobooth():
 	camera.vflip = True
 	camera.hflip = True
 	camera.start_preview()
-	camera.preview_fullscreen=True
-	preview_resolution = (1440, 900)
+	camera.preview_fullscreen=False
+	camera.preview_window = (0, 0, transform_x, h)
 	i=1 #iterate the blink of the light in prep, also gives a little time for the camera to warm up
 	GPIO.output(led1_pin,False)
 	#while i < prep_delay :
