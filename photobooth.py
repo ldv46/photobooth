@@ -35,21 +35,20 @@ capture_delay = 1 # delay between pics
 prep_delay = 1 # number of seconds at step 1 as users prep to have photo taken
 
 file_path = '/home/pi/photobooth/' #where do you want to save the photos
-tumblr_blog = 'username.tumblr.com' # change to your tumblr page
-addr_to   = 'secretcodehere@tumblr.com' # The special tumblr auto post email address
-addr_from = 'username@gmail.com' # change to your full gmail address
-user_name = 'username' # change to your gmail username
-password = 'secretpasswordhere' # change to your gmail password
-test_server = 'www.google.com'
+#tumblr_blog = 'username.tumblr.com' # change to your tumblr page
+#addr_to   = 'secretcodehere@tumblr.com' # The special tumblr auto post email address
+#addr_from = 'username@gmail.com' # change to your full gmail address
+#user_name = 'username' # change to your gmail username
+#password = 'secretpasswordhere' # change to your gmail password
+#test_server = 'www.google.com'
 
-w = 1280 # width of screen in pixels
-h = 720 # height of screen in pixels
+w = 1440 # width of screen in pixels
+h = 900 # height of screen in pixels
 transform_x = h*1.3 # how wide to scale the jpg when replaying
-transfrom_y = h # how high to scale the jpg when replaying
-offset_x = 0 # how far off to left corner to display photos
+transfrom_y = h # how high to scale the jpg when replayingoffset_x = 131 # how far off to left corner to display photos
 offset_y = 0 # how far off to left corner to display photos
 replay_delay = 0.5 # how much to wait in-between showing pics on-screen after taking
-replay_cycles = 2 # how many times to show each photo on-screen after taking
+replay_cycles = 1 # how many times to show each photo on-screen after taking
 
 ####################
 ### Other Config ###
@@ -133,20 +132,22 @@ def display_pics(jpg_group):
 # define the photo taking function for when the big button is pressed 
 def start_photobooth(): 
 	################################# Begin Step 1 ################################# 
+	GPIO.output(led1_pin,True)
 	print "Get Ready" 
 	camera = picamera.PiCamera()
-	camera.resolution = (2592, 1944) #use a smaller size to process faster
+	camera.resolution = (1440, 900) #use a smaller size to process faster (2592, 1944)
 	camera.vflip = True
 	camera.hflip = True
-	camera.saturation = 0
 	camera.start_preview()
-	camera.preview_fullscreen = True
-	preview_window = 0, 0, 70, 35
+	camera.preview_fullscreen=True
+	preview_resolution = (1440, 900)
 	i=1 #iterate the blink of the light in prep, also gives a little time for the camera to warm up
-	while i < prep_delay :
-	  GPIO.output(led1_pin,True); sleep(.5) 
-	  GPIO.output(led1_pin,False); sleep(.5); i+=1
+	GPIO.output(led1_pin,False)
+	#while i < prep_delay :
+	  #GPIO.output(led1_pin,True); sleep(.5) 
+	  #GPIO.output(led1_pin,False); sleep(.5); i+=1
 	################################# Begin Step 2 #################################
+	GPIO.output(led4_pin,True) #turn on the LED
 	print "Taking pics" 
 	now = time.strftime("%Y%m%d%H%M%S") #get the current date and time for the start of the filename
 	try: #take the photos
@@ -161,9 +162,9 @@ def start_photobooth():
 	finally:
 		camera.stop_preview()
 		camera.close()
-
-	########################### Begin Step 4 #################################
-	GPIO.output(led4_pin,True) #turn on the LED
+	GPIO.output(led4_pin,False) #turn on the LED
+	########################### Begin Step 3 #################################
+	GPIO.output(led3_pin,True) #turn on the LED
 	try:
 		display_pics(now)
 	except Exception, e:
@@ -171,7 +172,7 @@ def start_photobooth():
 		traceback.print_exception(e.__class__, e, tb)
 	pygame.quit()
 	print "Done"
-	GPIO.output(led4_pin,False) #turn off the LED
+	GPIO.output(led3_pin,False) #turn off the LED
 
 ####################
 ### Main Program ###
