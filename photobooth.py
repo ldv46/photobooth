@@ -27,7 +27,7 @@ led1_pin = 8 # LED 1 Rood
 led2_pin = 10 # LED 2 Rood
 led3_pin = 12 # LED 3 Groen
 led4_pin = 3 # LED 4 Blauw (en Relais)
-button1_pin = 15 # pin for the big red button
+button1_pin = 11 # pin for the big red button
 button2_pin = 16 # pin for button to shutdown the pi
 button3_pin = 18 # pin for button to end the program, but not shutdown the pi
 
