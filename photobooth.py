@@ -32,7 +32,7 @@ button2_pin = 16 # pin for button to shutdown the pi
 button3_pin = 18 # pin for button to end the program, but not shutdown the pi
 
 total_pics = 1 # number of pics  to be taken
-capture_delay = 1 # delay between pics
+capture_delay = 0 # delay between pics
 prep_delay = 5 # number of seconds at step 1 as users prep to have photo taken
 
 file_path = '/home/pi/photobooth/' #where do you want to save the photos
@@ -45,11 +45,11 @@ file_path = '/home/pi/photobooth/' #where do you want to save the photos
 
 w = 1440 # width of screen in pixels
 h = 900 # height of screen in pixels
-transform_x = int(h * 1.3) # how wide to scale the jpg when replaying
-transform_y = h # how high to scale the jpg when replayingoffset_x = 131 # how far off to left corner to display photos
+transform_x = w #int(h * 1.3) # how wide to scale the jpg when replaying
+transform_y = h # how high to scale the jpg when replaying
 offset_y = 0 # how far off to left corner to display photos
-offset_x = (w - transform_x) / 2
-replay_delay = 0.5 # how much to wait in-between showing pics on-screen after taking
+offset_x = 0 #(w - transform_x) / 2
+replay_delay = 7 # how much to wait in-between showing pics on-screen after taking
 replay_cycles = 1 # how many times to show each photo on-screen after taking
 
 ####################
@@ -82,7 +82,7 @@ def shut_it_down(channel):
     GPIO.output(led1_pin,True);
     GPIO.output(led2_pin,True);
     GPIO.output(led3_pin,True);
-    GPIO.output(led4_pin,True);
+    GPIO.output(led4_pin,False);
     time.sleep(3)
     os.system("sudo halt")
 
@@ -125,7 +125,7 @@ def display_pics(jpg_group):
     for i in range(0, replay_cycles): #show pics a few times
 		filename = file_path + jpg_group + ".jpg"
 		img=pygame.image.load(filename) 
-		img = pygame.transform.scale(img,(transform_x,transform_y))
+		img = pygame.transform.scale(img,(w,h))
 		screen.blit(img,(offset_x,offset_y))
 		pygame.display.flip() # update the display
 		time.sleep(replay_delay) # pause 
@@ -133,34 +133,32 @@ def display_pics(jpg_group):
 # define the photo taking function for when the big button is pressed 
 def start_photobooth(): 
 	################################# Begin Step 1 ################################# 
+	GPIO.output(led4_pin,True) #turn on the LED
 	GPIO.output(led1_pin,True)
 	print "Get Ready" 
 	camera = picamera.PiCamera()
-	camera.resolution = (transform_x, transform_y) #use a smaller size to process faster (2592, 1944)
+	camera.resolution = (w, h) #use a smaller size to process faster (2592, 1944)
 	camera.vflip = True
-	camera.hflip = True
+	camera.hflip = False
 	camera.start_preview()
 	camera.preview_fullscreen=False
-	camera.preview_window = (offset_x, offset_y, transform_x, transform_y)
+	camera.preview_window = (offset_x, offset_y, w, h)
 	i=1 #iterate the blink of the light in prep, also gives a little time for the camera to warm up
-	GPIO.output(led1_pin,False)
 	sleep(prep_delay)
-	#while i < prep_delay :
-	  #GPIO.output(led1_pin,True); sleep(.5) 
-	  #GPIO.output(led1_pin,False); sleep(.5); i+=1
+	GPIO.output(led1_pin,False)
 	################################# Begin Step 2 #################################
-	GPIO.output(led4_pin,True) #turn on the LED
 	print "Taking pics" 
 	now = time.strftime("%Y%m%d%H%M%S") #get the current date and time for the start of the filename
 	camera.stop_preview()
+	GPIO.output(led2_pin,True) #turn on the LED
 	camera.resolution = (2592, 1944)
+	camera.hflip = True
 	try: #take the photos
 			camera.capture(file_path + now + '.jpg')
-			GPIO.output(led2_pin,True) #turn on the LED
 			print(file_path + now + '.jpg')
-			GPIO.output(led2_pin,False) #turn off the LED
 	finally:
 		camera.close()
+		GPIO.output(led2_pin,False) #turn off the LED
 	GPIO.output(led4_pin,False) #turn on the LED
 	########################### Begin Step 3 #################################
 	GPIO.output(led3_pin,True) #turn on the LED
@@ -189,18 +187,14 @@ GPIO.output(led2_pin,True);
 time.sleep(.2)
 GPIO.output(led3_pin,True);
 time.sleep(.2)
-GPIO.output(led4_pin,True);
-time.sleep(.2)
 GPIO.output(led1_pin,False); #turn off the lights
 time.sleep(.2)
 GPIO.output(led2_pin,False);
 time.sleep(.2)
 GPIO.output(led3_pin,False);
-time.sleep(.2)
-GPIO.output(led4_pin,False);
 
 # wait for the big button to be pressed
 while True:
 	GPIO.wait_for_edge(button1_pin, GPIO.FALLING)
-	time.sleep(0.2) #debounce
+	#time.sleep(0.2) #debounce
 	start_photobooth()
