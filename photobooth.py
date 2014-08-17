@@ -23,13 +23,13 @@ from signal import alarm, signal, SIGALRM, SIGKILL
 ########################
 ### Variables Config ###
 ########################
-led1_pin = 15 # LED 1
-led2_pin = 19 # LED 2
-led3_pin = 21 # LED 3
-led4_pin = 23 # LED 4
-button1_pin = 22 # pin for the big red button
-button2_pin = 18 # pin for button to shutdown the pi
-button3_pin = 16 # pin for button to end the program, but not shutdown the pi
+led1_pin = 8 # LED 1 Rood
+led2_pin = 10 # LED 2 Rood
+led3_pin = 12 # LED 3 Groen
+led4_pin = 3 # LED 4 Blauw (en Relais)
+button1_pin = 15 # pin for the big red button
+button2_pin = 16 # pin for button to shutdown the pi
+button3_pin = 18 # pin for button to end the program, but not shutdown the pi
 
 total_pics = 1 # number of pics  to be taken
 capture_delay = 1 # delay between pics
