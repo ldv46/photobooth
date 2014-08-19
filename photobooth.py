@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # created by chris@drumminhands.com
 # see instructions at http://www.drumminhands.com/2014/06/15/raspberry-pi-photo-booth/
+#RG
 
 import os
 import time
