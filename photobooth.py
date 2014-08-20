@@ -138,6 +138,7 @@ def start_photobooth():
 	GPIO.output(led1_pin,True)
 	print "Get Ready" 
 	camera = picamera.PiCamera()
+	camera.led = False # Test om de LED van de camera uit te zetten.
 	camera.resolution = (w, h) #use a smaller size to process faster (2592, 1944)
 	camera.vflip = True
 	camera.hflip = False
