@@ -36,7 +36,7 @@ total_pics = 1 # number of pics  to be taken
 capture_delay = 0 # delay between pics
 prep_delay = 5 # number of seconds at step 1 as users prep to have photo taken
 
-file_path = '/home/pi/photobooth/' #where do you want to save the photos
+file_path = '/home/pi/photobooth/foto/' #where do you want to save the photos
 #tumblr_blog = 'username.tumblr.com' # change to your tumblr page
 #addr_to   = 'secretcodehere@tumblr.com' # The special tumblr auto post email address
 #addr_from = 'username@gmail.com' # change to your full gmail address
@@ -138,7 +138,6 @@ def start_photobooth():
 	GPIO.output(led1_pin,True)
 	print "Get Ready" 
 	camera = picamera.PiCamera()
-	camera.led = False # Test om de LED van de camera uit te zetten.
 	camera.resolution = (w, h) #use a smaller size to process faster (2592, 1944)
 	camera.vflip = True
 	camera.hflip = False
@@ -147,7 +146,7 @@ def start_photobooth():
 	camera.preview_window = (offset_x, offset_y, w, h)
 	i=1 #iterate the blink of the light in prep, also gives a little time for the camera to warm up
 	sleep(prep_delay)
-	#GPIO.output(led1_pin,False)
+	GPIO.output(led1_pin,False)
 	################################# Begin Step 2 #################################
 	print "Taking pics" 
 	now = time.strftime("%Y%m%d%H%M%S") #get the current date and time for the start of the filename
@@ -160,7 +159,7 @@ def start_photobooth():
 			print(file_path + now + '.jpg')
 	finally:
 		camera.close()
-		#GPIO.output(led2_pin,False) #turn off the LED
+		GPIO.output(led2_pin,False) #turn off the LED
 	GPIO.output(led4_pin,False) #turn on the LED
 	########################### Begin Step 3 #################################
 	GPIO.output(led3_pin,True) #turn on the LED
@@ -171,8 +170,6 @@ def start_photobooth():
 		traceback.print_exception(e.__class__, e, tb)
 	pygame.quit()
 	print "Done"
-	GPIO.output(led1_pin,False)
-	GPIO.output(led2_pin,False)
 	GPIO.output(led3_pin,False) #turn off the LED
 
 ####################
@@ -196,7 +193,7 @@ time.sleep(.2)
 GPIO.output(led2_pin,False);
 time.sleep(.2)
 GPIO.output(led3_pin,False);
-
+time.sleep(.2)
 # wait for the big button to be pressed
 while True:
 	GPIO.wait_for_edge(button1_pin, GPIO.FALLING)
