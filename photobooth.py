@@ -19,7 +19,9 @@ from email import Encoders
 import smtplib
 import socket
 import pygame
+import image
 from signal import alarm, signal, SIGALRM, SIGKILL
+
 
 ########################
 ### Variables Config ###
@@ -157,6 +159,15 @@ def start_photobooth():
 	try: #take the photos
 			camera.capture(file_path + now + '.jpg')
 			print(file_path + now + '.jpg')
+			########## Overlay ##########
+			background = Image.open(file_path + now + '.jpg') # Open captured image
+			overlay = Image.open("/home/pi/photobooth/overlay.png") # Open overlay image
+			
+			background = background.convert("RGBA")
+			overlay = overlay.convert("RGBA")
+
+			new_img = Image.blend(background, overlay, 1.0)
+			new_img.save('/home/pi/photobooth/overlay/' + 'a' + now + '.png','PNG')
 	finally:
 		camera.close()
 		GPIO.output(led2_pin,False) #turn off the LED
