@@ -159,17 +159,6 @@ def start_photobooth():
 	try: #take the photos
 			camera.capture(file_path + now + '.jpg')
 			print(file_path + now + '.jpg')
-			print "Overlay"
-			########## Overlay ##########
-			background = Image.open(file_path + now + '.jpg') # Open captured image
-			overlay = Image.open("/home/pi/photobooth/overlay.png") # Open overlay image
-			
-			background = background.convert("RGBA")
-			overlay = overlay.convert("RGBA")
-
-			new_img = Image.blend(background, overlay, 0.5)
-			new_img.save('/home/pi/photobooth/overlay/' + 'a' + now + '.jpg','JPEG')
-			print(file_path + 'a' + now + '.jpg')
 	finally:
 		camera.close()
 		GPIO.output(led2_pin,False) #turn off the LED
